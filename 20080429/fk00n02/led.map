@@ -1,0 +1,142 @@
+##########################################
+# (1) LINK INFORMATION                   #
+##########################################
+LN30 @.\led.cmd
+
+# LINK FILE INFORMATION
+NCRT0 (.\ncrt0.r30)
+	Apr 29 14:46:37 2008
+
+LED (.\led.r30)
+	Apr 29 20:58:14 2008
+
+AKI_LCD (.\aki_lcd.r30)
+	Apr 29 14:46:38 2008
+
+TEAMTAKAHAMA (.\teamtakahama.r30)
+	Apr 29 14:46:38 2008
+
+STRLEN (C:\MTOOL\LIB30\nc30lib.lib)
+	Apr 14 14:53:31 2003
+
+BZERO (C:\MTOOL\LIB30\nc30lib.lib)
+	Apr 14 14:53:32 2003
+
+BCOPY (C:\MTOOL\LIB30\nc30lib.lib)
+	Apr 14 14:53:32 2003
+
+_I4DIVU (C:\MTOOL\LIB30\nc30lib.lib)
+	Apr 14 14:53:41 2003
+
+_I4MULU (C:\MTOOL\LIB30\nc30lib.lib)
+	Apr 14 14:53:41 2003
+
+
+##########################################
+# (2) SECTION INFORMATION                #
+##########################################
+# SECTION                        ATR TYPE    START  LENGTH ALIGN MODULENAME
+data_SE                          ABS DATA    000400 000000       NCRT0
+bss_SE                           REL DATA    000400 000000 2     NCRT0
+data_SO                          REL DATA    000400 000000       NCRT0
+bss_SO                           REL DATA    000400 000000       NCRT0
+data_NE                          REL DATA    000400 000000 2     NCRT0
+bss_NE                           REL DATA    000400 000000 2     NCRT0
+data_NO                          REL DATA    000400 000000       NCRT0
+bss_NO                           REL DATA    000400 000000       NCRT0
+stack                            REL DATA    000400 000400       NCRT0
+heap                             REL DATA    000800 000000       NCRT0
+rom_NE                           REL ROMDATA 000800 000000 2     NCRT0
+rom_NO                           REL ROMDATA 000800 000000       NCRT0
+data_FE                          REL DATA    000800 000000       NCRT0
+bss_FE                           REL DATA    000800 000000 2     NCRT0
+data_FO                          REL DATA    000800 000000       NCRT0
+bss_FO                           REL DATA    000800 000000       NCRT0
+rom_FE                           ABS ROMDATA 0A0000 000000       NCRT0
+rom_FO                           REL ROMDATA 0A0000 000000       NCRT0
+                                 REL ROMDATA 0A0000 000230       LED
+data_SEI                         REL ROMDATA 0A0230 000000       NCRT0
+data_SOI                         REL ROMDATA 0A0230 000000       NCRT0
+data_NEI                         REL ROMDATA 0A0230 000000       NCRT0
+data_NOI                         REL ROMDATA 0A0230 000000       NCRT0
+data_FEI                         REL ROMDATA 0A0230 000000       NCRT0
+data_FOI                         REL ROMDATA 0A0230 000000       NCRT0
+program                          REL CODE    0A0230 000000       NCRT0
+                                 REL CODE    0A0230 0036FF 2     LED
+                                 REL CODE    0A3930 001089 2     AKI_LCD
+                                 REL CODE    0A49BA 000247 2     TEAMTAKAHAMA
+                                 REL CODE    0A4C02 00002B 2     STRLEN
+                                 REL CODE    0A4C2E 000028 2     BZERO
+                                 REL CODE    0A4C56 000035 2     BCOPY
+                                 REL CODE    0A4C8C 00004D 2     _I4DIVU
+                                 REL CODE    0A4CDA 00001C 2     _I4MULU
+interrupt                        REL CODE    0A4CF6 000000       NCRT0
+                                 REL CODE    0A4CF6 000111       NCRT0
+vector                           ABS ROMDATA 0FA000 000100       NCRT0
+fvector                          ABS ROMDATA 0FFFDC 000024       NCRT0
+# Total -------------------------------------------------------------------
+                                     DATA           000400(0001024) Byte(s)
+                                     ROMDATA        000354(0000852) Byte(s)
+                                     CODE           004BD7(0019415) Byte(s)
+
+##########################################
+# (3) GLOBAL LABEL INFORMATION           #
+##########################################
+$exit              0a4e04  $hpwm              0a4a70  $lcddebug1         0a3aea
+$lcdtext           0a488a  $lcdvar            0a41d6  $lcdwrite1comman   0a39be
+$lcdwrite1data     0a3a0a  $lcdwriteinit      0a3994  $magmatch          0a4b6e
+$pwm               0a4a2c  __i4divU           0a4c8c  __i4mulU           0a4cda
+_bcopy             0a4c56  _bzero             0a4c2e  _exit              0a4e04
+_init_ir           0a4a14  _init_moter        0a49ba  _lcd_init          0a3930
+_lcdbusycheck      0a3a88  _lcdclear          0a48dc  _magget            0a4a8a
+_main              0a0230  _strlen            0a4c02  _wait1             0a3a5e
+_wait2             0a3a6c  _wait3             0a3a7a  start              0a4cf6
+
+##########################################
+# (4) GLOBAL EQU SYMBOL INFORMATION      #
+##########################################
+__SB__           00000400  
+
+##########################################
+# (5) GLOBAL EQU BIT-SYMBOL INFORMATION  #
+##########################################
+
+##########################################
+# (6) LOCAL LABEL INFORMATION            #
+##########################################
+@ NCRT0 ( .\ncrt0.r30 )
+@ LED ( .\led.r30 )
+@ AKI_LCD ( .\aki_lcd.r30 )
+@ TEAMTAKAHAMA ( .\teamtakahama.r30 )
+@ STRLEN ( C:\MTOOL\LIB30\nc30lib.lib )
+@ BZERO ( C:\MTOOL\LIB30\nc30lib.lib )
+@ BCOPY ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4DIVU ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4MULU ( C:\MTOOL\LIB30\nc30lib.lib )
+
+##########################################
+# (7) LOCAL EQU SYMBOL INFORMATION       #
+##########################################
+@ NCRT0 ( .\ncrt0.r30 )
+@ LED ( .\led.r30 )
+@ AKI_LCD ( .\aki_lcd.r30 )
+@ TEAMTAKAHAMA ( .\teamtakahama.r30 )
+@ STRLEN ( C:\MTOOL\LIB30\nc30lib.lib )
+@ BZERO ( C:\MTOOL\LIB30\nc30lib.lib )
+@ BCOPY ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4DIVU ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4MULU ( C:\MTOOL\LIB30\nc30lib.lib )
+
+##########################################
+# (8) LOCAL EQU BIT-SYMBOL INFORMATION   #
+##########################################
+@ NCRT0 ( .\ncrt0.r30 )
+@ LED ( .\led.r30 )
+@ AKI_LCD ( .\aki_lcd.r30 )
+@ TEAMTAKAHAMA ( .\teamtakahama.r30 )
+@ STRLEN ( C:\MTOOL\LIB30\nc30lib.lib )
+@ BZERO ( C:\MTOOL\LIB30\nc30lib.lib )
+@ BCOPY ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4DIVU ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4MULU ( C:\MTOOL\LIB30\nc30lib.lib )
+

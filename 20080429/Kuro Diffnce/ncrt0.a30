@@ -1,0 +1,249 @@
+;///////////////////////////////////////////////////////////////////////////
+; 	file: ncrt0.a30
+; 	Revision: 1.0 
+; 	Date: 2004/08/3
+;***************************************************************************
+;
+;   ncrt0.a30 : NC30 startup program
+;
+;***************************************************************************
+
+KD_DEBUG	.equ	0					;1:KD30デバッグ時
+							
+PRCR		.equ	000ah					; プロテクトレジスタ
+PM0		.equ	0004h					; プロセッサモードレジスタ 0
+PM1		.equ	0005h					; プロセッサモードレジスタ 1
+CM0		.equ	0006h					; システムクロック制御レジスタ 0
+CM1		.equ	0007h					; システムクロック制御レジスタ 1
+CM2		.equ	000ch					; システムクロック制御レジスタ 2
+PLC0		.equ	001ch					; PLL制御レジスタ0
+CSR		.equ	0008h					; チップセレクト制御レジスタ
+PM2		.equ	001Eh					; プロセッサモードレジスタ 2
+CSE		.equ	001Bh					; チップセレクトウェイト	62P
+
+USE_MEMALLOC	.equ	0 				; 1:メモリ管理関数使用(malloc等)
+										; 0:未使用
+USE_STDIO	.equ	0				; 1:標準入出力関数使用(printf等)
+										; 0:未使用
+
+M62TYPE		.equ	1					; M16C/62を使用
+KDVECTOR	.equ	0FF900h					; ver 3.00
+
+;		.glb	__BankSelect
+;__BankSelect	.equ	0BH
+
+;---------------------------------------------------------------------
+; HEEP SIZE definition
+;---------------------------------------------------------------------
+.if USE_MEMALLOC == 0					;メモリ管理関数(malloc等)
+HEAPSIZE	.equ	0					; 未使用時
+.else
+HEAPSIZE	.equ	768					; 使用時
+.endif
+
+
+;---------------------------------------------------------------------
+; STACK SIZE definition
+;---------------------------------------------------------------------
+STACKSIZE	.equ	512
+
+;---------------------------------------------------------------------
+; INTERRUPT STACK SIZE definition
+;---------------------------------------------------------------------
+ISTACKSIZE	.equ	512
+
+;---------------------------------------------------------------------
+; INTERRUPT VECTOR ADDRESS  definition
+;---------------------------------------------------------------------
+VECTOR_ADR	.equ	0fa000h
+
+;---------------------------------------------------------------
+; special page definition
+;---------------------------------------------------------------
+;       macro define for special page
+;
+;Format:
+;	SPECIAL	number
+;
+
+SPECIAL	.macro	NUM
+	.org	0FFFFEH-(NUM*2)
+	.glb	__SPECIAL_@NUM
+	.word	__SPECIAL_@NUM  & 0FFFFH
+.endm
+;---------------------------------------------------------------------
+; Section allocation
+;---------------------------------------------------------------------
+	.list OFF
+	.include sect30.inc
+	.list ON
+
+;---------------------------------------------------------------------
+; SBDATA area definition
+;---------------------------------------------------------------------
+	.glb	__SB__
+__SB__	.equ	data_SE_top
+
+;====================================================================
+; Initialize Macro declaration
+;---------------------------------------------------------------------
+N_BZERO	.macro	TOP_ ,SECT_
+	mov.b	#00H, R0L
+	mov.w	#(TOP_ & 0FFFFH), A1
+	mov.w	#sizeof SECT_ , R3
+	sstr.b	
+	.endm
+
+N_BCOPY .macro	FROM_,TO_,SECT_
+	mov.w	#(FROM_ & 0FFFFH),A0
+	mov.b	#(FROM_ >>16),R1H
+	mov.w	#TO_ ,A1
+	mov.w	#sizeof SECT_ , R3
+	smovf.b
+	.endm
+
+BZERO	.macro	TOP_,SECT_
+	push.w	#sizeof SECT_ >> 16
+	push.w	#sizeof SECT_  & 0ffffh
+	pusha	TOP_ >>16
+	pusha	TOP_ & 0ffffh
+	.stk	8
+	.glb	_bzero	
+	.call	_bzero,G
+	jsr.a	_bzero
+	.endm
+
+
+BCOPY	.macro	FROM_ ,TO_ ,SECT_
+	push.w	#sizeof SECT_  >> 16
+	push.w	#sizeof SECT_  & 0ffffh
+	pusha	TO_ >>16
+	pusha	TO_  & 0ffffh
+	pusha	FROM_ >>16
+	pusha	FROM_  & 0ffffh
+	.stk	12
+	.glb	_bcopy
+	.call   _bcopy,G
+	jsr.a	_bcopy
+	.endm
+
+;====================================================================
+; Interrupt section start
+;---------------------------------------------------------------------
+	.insf	start,S,0
+	.glb	start
+	.section	interrupt
+start:
+;---------------------------------------------------------------------
+; after reset,this program will start
+;---------------------------------------------------------------------
+	ldc	#istack_top,isp				;set istack pointer
+	
+	mov.b	#00000011b, PRCR			;プロセッサモードレジスタPM0,1への書き込み許可
+	mov.b	#00000000b,PM0		;PM0: single chip mode / P40-43=I/O
+	mov.b	#00001000b,PM1		;PM1: Normal/No Wait memory192/15 BLOCK_A=able P37-34=I/O
+	mov.b	#00000000b,PM2		;PM2: 
+	
+.if KD_DEBUG == 0					;KD_DEBUG=1(KD30使用）のとき、クロック関連の設定禁止
+	mov.b	#00001000b, CM0				;メインクロック分周なし(CM16,17有効)
+	mov.b	#00100000b, CM1				;CM16,17=0　分周なし PLLクロック選択
+	mov.b	#00000000b, CM2				;
+	mov.b	#10010010b, PLC0			;PLL動作　4逓倍
+.endif	
+	mov.b	#00100010b, CM1				;CM16,17=0　分周なし PLLクロック選択	
+	mov.b	#00000000b, PRCR			;プロセッサモードレジスタPM0,1への書き込み禁止
+
+	ldc	#0080h,	flg				;ユーザスタックポインタ
+	ldc	#stack_top,	sp			;set stack pointer 
+	ldc	#data_SE_top,sb				;set sb register 
+	ldintb	#VECTOR_ADR
+	fset	i					;割り込み許可
+
+;====================================================================
+; NEAR area initialize.
+;--------------------------------------------------------------------
+; bss zero clear
+;--------------------------------------------------------------------
+	N_BZERO	bss_SE_top,bss_SE
+	N_BZERO	bss_SO_top,bss_SO
+	N_BZERO	bss_NE_top,bss_NE
+	N_BZERO	bss_NO_top,bss_NO
+
+;---------------------------------------------------------------------
+; initialize data section
+;---------------------------------------------------------------------
+	N_BCOPY data_SEI_top,data_SE_top,data_SE
+	N_BCOPY	data_SOI_top,data_SO_top,data_SO
+	N_BCOPY	data_NEI_top,data_NE_top,data_NE
+	N_BCOPY	data_NOI_top,data_NO_top,data_NO
+
+;====================================================================
+; FAR area initialize.
+;---------------------------------------------------------------------
+; bss zero clear
+;---------------------------------------------------------------------
+	BZERO	bss_FE_top,bss_FE
+	BZERO	bss_FO_top,bss_FO
+
+;---------------------------------------------------------------------
+; Copy edata_E(O) section from edata_EI(OI) section
+;---------------------------------------------------------------------
+	BCOPY	data_FEI_top,data_FE_top,data_FE
+	BCOPY	data_FOI_top,data_FO_top,data_FO
+
+	ldc		#stack_top,sp			; BZERO, BCOPYで使用したスタックを元に戻す(= 8*2 + 12*2)
+	.stk	-40					
+
+
+;====================================================================
+; heap area initialize
+;---------------------------------------------------------------------
+.if USE_MEMALLOC == 1					;メモリ管理関数(malloc等)
+	.glb	__mbase
+	.glb	__mnext
+	.glb	__msize
+	mov.w	#(heap_top&0FFFFH), __mbase
+	mov.w	#(heap_top>>16), __mbase+2
+	mov.w	#(heap_top&0FFFFH), __mnext
+	mov.w	#(heap_top>>16), __mnext+2
+	mov.w	#(HEAPSIZE&0FFFFH), __msize
+	mov.w	#(HEAPSIZE>>16), __msize+2
+.endif
+
+
+;====================================================================
+; Initialize standard I/O
+;---------------------------------------------------------------------
+.if USE_STDIO == 1						; 標準入出力関数(printf等)
+	.glb	_init
+	.call	_init,G
+	jsr.a	_init
+.endif
+
+
+;====================================================================
+; Call main() function
+;---------------------------------------------------------------------
+	ldc		#0h,fb	; for debuger
+
+	.glb	_main
+	jsr.a	_main
+
+;====================================================================
+; exit() function
+;---------------------------------------------------------------------
+	.glb	_exit
+	.glb	$exit
+_exit:			   ; End program
+$exit:
+	jmp	_exit
+	.einsf
+;====================================================================
+; dummy interrupt function
+;---------------------------------------------------------------------
+dummy_int:
+	reit
+	.end
+
+
+;***************************************************************************

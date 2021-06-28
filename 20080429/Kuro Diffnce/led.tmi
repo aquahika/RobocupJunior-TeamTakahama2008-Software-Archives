@@ -1,0 +1,29 @@
+[PROJECT]
+ProjectName=led
+WorkingDirectory=C:\develop-m16c-62p\fk00n02
+OutputDirectory=.
+ProjectFile=C:\develop-m16c-62p\fk00n02\led.tmk
+ProjectInfoFile=C:\develop-m16c-62p\fk00n02\led.tmi
+TargetName=M16C Family
+Type=1
+GoalFile=C:\develop-m16c-62p\fk00n02\led.x30
+[NC]
+Name=NC30WA
+Version=V.5.10 Release 1
+[MEMBER]
+Count=0
+[DOCUMENTFILE]
+Count=0
+[ITEM]
+ActiveFactory=default
+FactoryName1=default
+ActiveTagName1=all
+Count=1
+[TOOL]
+ToolCount=1
+ToolName1=lmc30
+[PD]
+Name=kd30
+Version=
+Path=C:\MTOOL\KD30\kd30.exe
+Type=0

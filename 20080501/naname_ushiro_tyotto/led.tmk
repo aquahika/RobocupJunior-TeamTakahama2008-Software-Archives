@@ -1,0 +1,80 @@
+####################################################################
+# Makefile for TM V.3.20A
+# COPYRIGHT(C) 1998(1998-2003)
+# RENESAS TECHNOLOGY CORPORATION ALL RIGHTS RESERVED
+# AND
+# RENESAS SOLUTIONS CORPORATION ALL RIGHTS RESERVED
+#
+#	Notice	:	Don't edit.
+#	Date	:	2008 04(April) 29(Tuesday) PM.01.38
+#	Project	:	led
+####################################################################
+
+DELETE	=	@-del
+LNLIST	=	$(PROJECT).cmd
+PRJDIR	=	C:\develop-m16c-62p\naname_ushiro_tyotto
+LMC	=	LMC30
+CC	=	NC30
+AS	=	AS30
+OUTDIR	=	.
+MKDIR	=	@-mkdir
+ABSFILE	=	$(PROJECT).x30
+ODINCMD	=	$(OUTDIR)
+TARGET	=	$(ABSFILE)
+LN	=	LN30
+ECHO	=	@-echo
+MKFILE	=	$(PROJECT).tmk
+TYPE	=	@-type
+PROJECT	=	led
+LFLAGS	=	-G -MS -L nc30lib -O $(OUTDIR)\$(TARGET)
+CFLAGS	=	-c -dir $(OUTDIR) -g
+LMCFLAGS	=	-L
+AFLAGS	=	-LM -O$(OUTDIR)
+.SUFFIXES: .a30 .r30 .c .x30
+.PHONY: all
+all: \
+		$(OUTDIR)\$(TARGET) 
+.PHONY: clean
+clean: 
+	$(DELETE) $(OUTDIR)\$(TARGET)
+	$(DELETE) $(ODINCMD)\$(LNLIST)
+	$(DELETE) $(OUTDIR)\ncrt0.r30
+	$(DELETE) $(OUTDIR)\led.r30
+	$(DELETE) $(OUTDIR)\aki_lcd.r30
+	$(DELETE) $(OUTDIR)\teamtakahama.r30
+$(OUTDIR)\aki_lcd.r30: \
+		.\aki_lcd.c 
+	$(CC) $(MRCFLAGS) $(CFLAGS) aki_lcd.c
+$(ODINCMD)\$(LNLIST): \
+		.\$(MKFILE) 
+	$(ECHO)\$(MRLFLAGS) $(LFLAGS) >	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\ncrt0.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\led.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\aki_lcd.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\teamtakahama.r30 >>	$(ODINCMD)\$(LNLIST)
+$(OUTDIR)\led.r30: \
+		.\led.c \
+		.\sfr62p.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) led.c
+$(OUTDIR)\$(TARGET): \
+		$(ODINCMD)\$(LNLIST) \
+		$(OUTDIR)\ncrt0.r30 \
+		$(OUTDIR)\led.r30 \
+		$(OUTDIR)\aki_lcd.r30 \
+		$(OUTDIR)\teamtakahama.r30 
+	$(LN) @$(ODINCMD)\$(LNLIST)
+	$(LMC) $(LMCFLAGS) $(OUTDIR)\$(ABSFILE)
+$(OUTDIR)\ncrt0.r30: \
+		.\ncrt0.a30 \
+		.\sect30.inc 
+	$(AS) $(MRAFLAGS) $(AFLAGS) ncrt0.a30
+$(OUTDIR)\teamtakahama.r30: \
+		.\teamtakahama.c 
+	$(CC) $(MRCFLAGS) $(CFLAGS) teamtakahama.c
+####################################################################
+# End of makefile for TM V.3.20A
+# COPYRIGHT(C) 1998(1998-2003)
+# RENESAS TECHNOLOGY CORPORATION ALL RIGHTS RESERVED
+# AND
+# RENESAS SOLUTIONS CORPORATION ALL RIGHTS RESERVED
+####################################################################
